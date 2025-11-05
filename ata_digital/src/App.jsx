@@ -3,7 +3,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ClassRoom from './pages/ClassRoom';
 import Profile from './pages/Profile';
-import './App.css';
+import './styles/globals.css';
 
 function App() {
   const isAuthenticated = () => {

@@ -1,0 +1,19 @@
+# Node modules
+node_modules/
+ata_digital/node_modules/
+backend/node_modules/
+
+# Database
+backend/ata_digital.db
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# Build
+ata_digital/dist/
+
+# Temporary files
+backend/check_users.js

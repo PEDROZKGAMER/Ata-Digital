@@ -1,13 +1,15 @@
-export const captureImageFromVideo = (videoElement) => {
+export const captureImageFromVideo = (videoElement, maxWidth = 150, maxHeight = 150) => {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
   
-  canvas.width = videoElement.videoWidth;
-  canvas.height = videoElement.videoHeight;
+  // Calcular proporções
+  const ratio = Math.min(maxWidth / videoElement.videoWidth, maxHeight / videoElement.videoHeight);
+  canvas.width = videoElement.videoWidth * ratio;
+  canvas.height = videoElement.videoHeight * ratio;
   
   context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
   
-  return canvas.toDataURL('image/jpeg', 0.8);
+  return canvas.toDataURL('image/jpeg', 0.6);
 };
 
 export const resizeImage = (file, maxWidth = 300, maxHeight = 300, quality = 0.8) => {

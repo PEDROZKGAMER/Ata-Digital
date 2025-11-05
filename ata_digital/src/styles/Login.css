@@ -1,0 +1,28 @@
+/* Login Page Styles */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-xl);
+  border: none;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: var(--space-2);
+  }
+  
+  .login-card {
+    margin: var(--space-2);
+    max-width: none;
+  }
+}

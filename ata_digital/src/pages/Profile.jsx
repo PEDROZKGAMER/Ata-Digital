@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userAPI } from '../services/api';
 import { captureImageFromVideo, resizeImage } from '../utils/imageCapture';
+import ImageCrop from '../components/ImageCrop';
+import '../styles/Profile.css';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -22,6 +24,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
+  const [showCrop, setShowCrop] = useState(false);
+  const [tempImage, setTempImage] = useState('');
 
   useEffect(() => {
     loadProfile();
@@ -75,18 +79,36 @@ const Profile = () => {
 
   const capturePhoto = () => {
     if (videoRef.current && cameraReady) {
-      const photo = captureImageFromVideo(videoRef.current);
-      setFormData({ ...formData, profile_photo: photo });
+      const photo = captureImageFromVideo(videoRef.current, 400, 300);
+      setTempImage(photo);
+      setShowCrop(true);
       stopCamera();
     }
   };
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
+    console.log('Arquivo selecionado:', file);
     if (file) {
-      const resizedImage = await resizeImage(file, 200, 200);
-      setFormData({ ...formData, profile_photo: resizedImage });
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        console.log('Imagem carregada, abrindo crop');
+        setTempImage(e.target.result);
+        setShowCrop(true);
+      };
+      reader.readAsDataURL(file);
     }
+  };
+
+  const handleCropComplete = (croppedImage) => {
+    setFormData({ ...formData, profile_photo: croppedImage });
+    setShowCrop(false);
+    setTempImage('');
+  };
+
+  const handleCropCancel = () => {
+    setShowCrop(false);
+    setTempImage('');
   };
 
   const handleUpdate = async (e) => {
@@ -165,7 +187,7 @@ const Profile = () => {
                   <img 
                     src={formData.profile_photo} 
                     alt="Perfil"
-                    className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                    className="profile-avatar"
                   />
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold shadow-lg">
@@ -340,6 +362,15 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      
+      {/* Image Crop Modal */}
+      {showCrop && (
+        <ImageCrop
+          imageSrc={tempImage}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+        />
+      )}
     </div>
   );
 };

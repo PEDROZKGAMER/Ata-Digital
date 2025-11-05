@@ -11,33 +11,40 @@ export const generateAttendancePDF = (classData, attendanceList) => {
   pdf.setFontSize(12);
   pdf.text(`Aula: ${classData.name}`, 20, 40);
   pdf.text(`Curso: ${classData.course}`, 20, 50);
-  pdf.text(`Data: ${new Date(classData.date).toLocaleDateString('pt-BR')}`, 20, 60);
-  pdf.text(`Horário: ${classData.startTime} - ${classData.endTime}`, 20, 70);
+  pdf.text(`Data: ${new Date(classData.date + 'T00:00:00').toLocaleDateString('pt-BR')}`, 20, 60);
+  pdf.text(`Horário: ${classData.startTime}`, 20, 70);
   
-  // Tabela de presença
-  pdf.setFontSize(10);
   let y = 90;
   
-  // Cabeçalho da tabela
-  pdf.text('Matrícula', 20, y);
-  pdf.text('Nome', 60, y);
-  pdf.text('Horário de Entrada', 140, y);
-  
-  y += 10;
-  pdf.line(20, y, 190, y); // Linha horizontal
-  
-  // Lista de alunos
+  // Lista de alunos com fotos
   attendanceList.forEach((student, index) => {
-    y += 10;
-    pdf.text(student.matricula, 20, y);
-    pdf.text(student.nome, 60, y);
-    pdf.text(new Date(student.timestamp).toLocaleTimeString('pt-BR'), 140, y);
-    
-    // Nova página se necessário
-    if (y > 270) {
+    // Verificar se precisa de nova página
+    if (y > 240) {
       pdf.addPage();
       y = 20;
     }
+    
+    // Informações do aluno
+    pdf.setFontSize(10);
+    pdf.text(`${index + 1}. Nome: ${student.nome}`, 20, y);
+    pdf.text(`Matrícula: ${student.matricula}`, 20, y + 8);
+    pdf.text(`Curso: ${student.curso || 'N/A'}`, 20, y + 16);
+    pdf.text(`Período: ${student.periodo || 'N/A'}`, 20, y + 24);
+    pdf.text(`Horário: ${new Date(student.timestamp).toLocaleTimeString('pt-BR')}`, 20, y + 32);
+    
+    // Adicionar foto se existir
+    if (student.biometria) {
+      try {
+        pdf.addImage(student.biometria, 'JPEG', 140, y - 5, 30, 30);
+      } catch (error) {
+        console.error('Erro ao adicionar imagem ao PDF:', error);
+        pdf.text('Foto n/disponível', 140, y + 15);
+      }
+    }
+    
+    // Linha separadora
+    pdf.line(20, y + 40, 190, y + 40);
+    y += 50;
   });
   
   // Rodapé

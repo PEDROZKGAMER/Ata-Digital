@@ -1,0 +1,121 @@
+/* Profile Page Styles */
+.profile-container {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.profile-card-header {
+  text-align: center;
+  padding: var(--space-6);
+}
+
+.profile-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.profile-avatar {
+  width: 6rem !important;
+  height: 6rem !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  border: 4px solid var(--white) !important;
+  box-shadow: var(--shadow-lg) !important;
+  display: block !important;
+}
+
+.profile-avatar-placeholder {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--white);
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-lg);
+}
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.camera-modal {
+  background-color: var(--gray-100);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.camera-preview-video {
+  width: 100%;
+  max-width: 20rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  aspect-ratio: 1/1;
+  object-fit: cover;
+}
+
+.camera-controls {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.photo-upload-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.photo-buttons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.danger-zone {
+  border-color: var(--error) !important;
+}
+
+.danger-zone .card-header {
+  background-color: #fee2e2;
+  border-color: var(--error);
+}
+
+.danger-zone h2 {
+  color: var(--error);
+}
+
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: stretch;
+  }
+  
+  .profile-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .photo-buttons {
+    flex-direction: column;
+  }
+  
+  .camera-controls {
+    flex-direction: column;
+  }
+}

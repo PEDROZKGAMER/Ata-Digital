@@ -1,0 +1,117 @@
+/* ClassRoom Page Styles */
+.classroom-container {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.classroom-header {
+  margin-bottom: var(--space-6);
+}
+
+.classroom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+}
+
+.attendance-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.camera-container {
+  margin-bottom: var(--space-4);
+}
+
+.camera-video {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--gray-200);
+  max-width: 400px;
+  aspect-ratio: 4/3;
+}
+
+.camera-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.attendance-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.attendance-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  background-color: var(--gray-50);
+  margin-bottom: var(--space-3);
+}
+
+.attendance-photo {
+  width: 1rem;
+  height: 2rem;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  border: 2px solid var(--white);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.attendance-info {
+  flex: 1;
+}
+
+.attendance-name {
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: var(--space-1);
+}
+
+.attendance-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+
+.attendance-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 768px) {
+  .classroom-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .camera-video {
+    min-height: 200px;
+  }
+  
+  .attendance-details {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+  
+  .attendance-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  
+  .attendance-actions {
+    align-self: flex-end;
+  }
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { classAPI } from '../services/api';
+import '../styles/Dashboard.css';
 
 const Dashboard = () => {
   const [classes, setClasses] = useState([]);
@@ -84,19 +85,22 @@ const Dashboard = () => {
       <div className="card mb-6">
         <div className="card-body">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="flex-shrink-0">
+            <div className="flex items-center gap-6">
+              <div className="relative flex-shrink-0">
                 {user.profile_photo ? (
                   <img 
                     src={user.profile_photo} 
                     alt="Perfil"
-                    className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md"
+                    className="dashboard-avatar"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold shadow-md">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center text-xl font-bold shadow-xl ring-4 ring-primary/20">
                     {user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '👤'}
                   </div>
                 )}
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-success rounded-full border-3 border-white flex items-center justify-center">
+                  <span className="text-white text-xs">✓</span>
+                </div>
               </div>
               <div>
                 <h1 className="mb-1">📚 Dashboard</h1>

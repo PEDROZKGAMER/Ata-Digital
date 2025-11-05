@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { classAPI, attendanceAPI } from '../services/api';
 import { loadModels, detectFace, captureImage } from '../utils/faceRecognition';
 import { generateAttendancePDF } from '../utils/pdfGenerator';
+import CustomSelect from '../components/CustomSelect';
+import '../styles/ClassRoom.css';
 
 const ClassRoom = () => {
   const { id } = useParams();
@@ -10,7 +12,7 @@ const ClassRoom = () => {
   const videoRef = useRef();
   const [classData, setClassData] = useState(null);
   const [attendance, setAttendance] = useState([]);
-  const [studentForm, setStudentForm] = useState({ matricula: '', nome: '' });
+  const [studentForm, setStudentForm] = useState({ nome: '', matricula: '', curso: '', periodo: '' });
   const [isCapturing, setIsCapturing] = useState(false);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [cameraStatus, setCameraStatus] = useState('loading');
@@ -58,15 +60,15 @@ const ClassRoom = () => {
   };
 
   const handleAttendance = async () => {
-    if (!studentForm.matricula || !studentForm.nome) {
-      alert('Preencha matrícula e nome do aluno');
+    if (!studentForm.nome || !studentForm.matricula || !studentForm.curso || !studentForm.periodo) {
+      alert('Preencha todos os campos obrigatórios');
       return;
     }
 
     setIsCapturing(true);
     
     try {
-      // Capturar imagem da biometria facial
+      // Capturar imagem da biometria facial (redimensionada)
       const faceImage = captureImage(videoRef.current);
       
       // Detectar face (opcional - para validação)
@@ -82,17 +84,20 @@ const ClassRoom = () => {
       // Registrar presença
       const attendanceData = {
         classId: id,
-        matricula: studentForm.matricula,
         nome: studentForm.nome,
+        matricula: studentForm.matricula,
+        curso: studentForm.curso,
+        periodo: studentForm.periodo,
         biometria: faceImage,
         timestamp: new Date().toISOString()
       };
 
       await attendanceAPI.register(attendanceData);
       
-      // Atualizar lista local
-      setAttendance([...attendance, attendanceData]);
-      setStudentForm({ matricula: '', nome: '' });
+      // Recarregar lista do servidor para pegar o ID correto
+      const updatedAttendance = await attendanceAPI.getByClass(id);
+      setAttendance(updatedAttendance.data);
+      setStudentForm({ nome: '', matricula: '', curso: '', periodo: '' });
       
       alert('Presença registrada com sucesso!');
     } catch (error) {
@@ -188,7 +193,7 @@ const ClassRoom = () => {
 
       <div className="grid grid-cols-2 gap-6">
         {/* Registro de Presença */}
-        <div className="card">
+        <div className="card card-scroll">
           <div className="card-header">
             <h2>📷 Registro de Presença</h2>
             <div className="flex items-center gap-2 mt-2">
@@ -220,17 +225,6 @@ const ClassRoom = () => {
             
             <div className="flex flex-col gap-4">
               <div className="form-group">
-                <label className="form-label">Matrícula do Aluno</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Ex: 2024001"
-                  value={studentForm.matricula}
-                  onChange={(e) => setStudentForm({...studentForm, matricula: e.target.value})}
-                />
-              </div>
-              
-              <div className="form-group">
                 <label className="form-label">Nome Completo</label>
                 <input
                   type="text"
@@ -238,8 +232,112 @@ const ClassRoom = () => {
                   placeholder="Ex: João Silva Santos"
                   value={studentForm.nome}
                   onChange={(e) => setStudentForm({...studentForm, nome: e.target.value})}
+                  required
                 />
               </div>
+              
+              <div className="form-group">
+                <label className="form-label">Matrícula</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Ex: 2024001"
+                  value={studentForm.matricula}
+                  onChange={(e) => setStudentForm({...studentForm, matricula: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <CustomSelect
+                label="Curso"
+                value={studentForm.curso}
+                onChange={(value) => setStudentForm({...studentForm, curso: value})}
+                placeholder="Selecione o curso"
+                required
+                options={[
+                  {
+                    label: "🔧 Engenharias",
+                    options: [
+                      { value: "Engenharia Civil", label: "Engenharia Civil" },
+                      { value: "Engenharia Mecânica", label: "Engenharia Mecânica" },
+                      { value: "Engenharia Elétrica", label: "Engenharia Elétrica" },
+                      { value: "Engenharia de Computação", label: "Engenharia de Computação" },
+                      { value: "Engenharia de Produção", label: "Engenharia de Produção" },
+                      { value: "Engenharia Química", label: "Engenharia Química" }
+                    ]
+                  },
+                  {
+                    label: "💻 Tecnologia",
+                    options: [
+                      { value: "Ciência da Computação", label: "Ciência da Computação" },
+                      { value: "Sistemas de Informação", label: "Sistemas de Informação" },
+                      { value: "Análise e Desenvolvimento de Sistemas", label: "Análise e Desenvolvimento de Sistemas" },
+                      { value: "Redes de Computadores", label: "Redes de Computadores" },
+                      { value: "Segurança da Informação", label: "Segurança da Informação" }
+                    ]
+                  },
+                  {
+                    label: "🏥 Saúde",
+                    options: [
+                      { value: "Medicina", label: "Medicina" },
+                      { value: "Enfermagem", label: "Enfermagem" },
+                      { value: "Fisioterapia", label: "Fisioterapia" },
+                      { value: "Psicologia", label: "Psicologia" },
+                      { value: "Nutrição", label: "Nutrição" },
+                      { value: "Farmácia", label: "Farmácia" }
+                    ]
+                  },
+                  {
+                    label: "📚 Humanas",
+                    options: [
+                      { value: "Direito", label: "Direito" },
+                      { value: "Administração", label: "Administração" },
+                      { value: "Contabilidade", label: "Contabilidade" },
+                      { value: "Pedagogia", label: "Pedagogia" },
+                      { value: "Letras", label: "Letras" },
+                      { value: "História", label: "História" }
+                    ]
+                  },
+                  {
+                    label: "🔬 Exatas",
+                    options: [
+                      { value: "Matemática", label: "Matemática" },
+                      { value: "Física", label: "Física" },
+                      { value: "Química", label: "Química" },
+                      { value: "Estatística", label: "Estatística" }
+                    ]
+                  },
+                  {
+                    label: "🎨 Outros",
+                    options: [
+                      { value: "Arquitetura", label: "Arquitetura" },
+                      { value: "Design", label: "Design" },
+                      { value: "Comunicação Social", label: "Comunicação Social" },
+                      { value: "Turismo", label: "Turismo" }
+                    ]
+                  }
+                ]}
+              />
+              
+              <CustomSelect
+                label="Período"
+                value={studentForm.periodo}
+                onChange={(value) => setStudentForm({...studentForm, periodo: value})}
+                placeholder="Selecione o período"
+                required
+                options={[
+                  { value: "1º Período", label: "🌱 1º Período" },
+                  { value: "2º Período", label: "🌱 2º Período" },
+                  { value: "3º Período", label: "🌿 3º Período" },
+                  { value: "4º Período", label: "🌿 4º Período" },
+                  { value: "5º Período", label: "🌳 5º Período" },
+                  { value: "6º Período", label: "🌳 6º Período" },
+                  { value: "7º Período", label: "🌲 7º Período" },
+                  { value: "8º Período", label: "🌲 8º Período" },
+                  { value: "9º Período", label: "🌴 9º Período" },
+                  { value: "10º Período", label: "🌴 10º Período" }
+                ]}
+              />
               
               <button 
                 onClick={handleAttendance}
@@ -271,32 +369,60 @@ const ClassRoom = () => {
             ) : (
               <div className="flex flex-col gap-3">
                 {attendance.map((student, index) => (
-                  <div key={index} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <div className="flex-shrink-0">
-                      <img 
-                        src={student.biometria} 
-                        alt="Biometria"
-                        className="w-16 h-16 rounded-lg object-cover border-2 border-white shadow-sm cursor-pointer image-hover"
-                        onClick={() => window.open(student.biometria, '_blank')}
-                        title="Clique para ampliar"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">{student.nome}</h4>
-                      <div className="flex gap-4 text-sm text-gray-600">
-                        <span>🎫 <strong>Matrícula:</strong> {student.matricula}</span>
-                        <span>🕐 <strong>Horário:</strong> {formatTime(student.timestamp)}</span>
+                  <div key={index} className="card mb-4">
+                    <div className="card-body">
+                      <div className="flex gap-6">
+                        {/* Foto */}
+                        <div className="flex-shrink-0">
+                          <img 
+                            src={student.biometria} 
+                            alt="Biometria"
+                            className="rounded-lg object-cover border-2 border-primary shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                            style={{ width: '120px', height: '120px' }}
+                            onClick={() => window.open(student.biometria, '_blank')}
+                            title="Clique para ampliar"
+                          />
+                        </div>
+                        
+                        {/* Informações */}
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-3">
+                            <h3 className="text-xl font-bold text-gray-900 mb-0">{student.nome}</h3>
+                            <div className="flex items-center gap-2">
+                              <span className="badge badge-success text-sm">✓ Presente</span>
+                              <button 
+                                onClick={() => handleDeleteAttendance(student.id, student.nome)}
+                                className="btn btn-error btn-sm"
+                                title="Remover presença"
+                              >
+                                🗑️ Remover
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <div className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Matrícula</div>
+                              <div className="text-lg font-semibold text-gray-900">🎫 {student.matricula}</div>
+                            </div>
+                            
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <div className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Curso</div>
+                              <div className="text-sm font-medium text-gray-800">🎓 {student.curso || 'N/A'}</div>
+                            </div>
+                            
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <div className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Período</div>
+                              <div className="text-sm font-medium text-gray-800">📚 {student.periodo || 'N/A'}</div>
+                            </div>
+                            
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <div className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Horário de Entrada</div>
+                              <div className="text-lg font-semibold text-primary">🕐 {formatTime(student.timestamp)}</div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex-shrink-0 flex items-center gap-2">
-                      <span className="badge badge-success">✓ Presente</span>
-                      <button 
-                        onClick={() => handleDeleteAttendance(student.id, student.nome)}
-                        className="btn btn-error btn-sm"
-                        title="Remover presença"
-                      >
-                        🗑️
-                      </button>
                     </div>
                   </div>
                 ))}

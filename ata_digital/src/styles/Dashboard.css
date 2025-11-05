@@ -1,0 +1,65 @@
+/* Dashboard Page Styles */
+.dashboard-header {
+  margin-bottom: var(--space-6);
+}
+
+.dashboard-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.dashboard-avatar {
+  width: 5rem !important;
+  height: 5rem !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  border: 4px solid var(--white) !important;
+  box-shadow: var(--shadow-xl) !important;
+  display: block !important;
+}
+
+.dashboard-avatar-placeholder {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--white);
+  font-size: 1.125rem;
+  box-shadow: var(--shadow-md);
+}
+
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--space-4);
+}
+
+.class-card-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .dashboard-user-info {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-2);
+  }
+  
+  .dashboard-avatar,
+  .dashboard-avatar-placeholder {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+  
+  .class-card-actions {
+    flex-direction: column;
+  }
+}

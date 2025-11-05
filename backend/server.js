@@ -60,12 +60,27 @@ db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS attendance (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     class_id INTEGER,
-    matricula TEXT NOT NULL,
     nome TEXT NOT NULL,
+    matricula TEXT NOT NULL,
+    curso TEXT NOT NULL,
+    periodo TEXT NOT NULL,
     biometria TEXT NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (class_id) REFERENCES classes (id)
   )`);
+  
+  // Add new columns if they don't exist
+  db.run(`ALTER TABLE attendance ADD COLUMN curso TEXT`, (err) => {
+    if (err && !err.message.includes('duplicate column name')) {
+      console.error('Erro ao adicionar coluna curso:', err);
+    }
+  });
+  
+  db.run(`ALTER TABLE attendance ADD COLUMN periodo TEXT`, (err) => {
+    if (err && !err.message.includes('duplicate column name')) {
+      console.error('Erro ao adicionar coluna periodo:', err);
+    }
+  });
 });
 
 // Auth middleware
@@ -231,11 +246,11 @@ app.delete('/api/classes/:id', authenticateToken, (req, res) => {
 
 // Attendance routes
 app.post('/api/attendance', (req, res) => {
-  const { classId, matricula, nome, biometria } = req.body;
+  const { classId, nome, matricula, curso, periodo, biometria } = req.body;
 
   db.run(
-    'INSERT INTO attendance (class_id, matricula, nome, biometria) VALUES (?, ?, ?, ?)',
-    [classId, matricula, nome, biometria],
+    'INSERT INTO attendance (class_id, nome, matricula, curso, periodo, biometria) VALUES (?, ?, ?, ?, ?, ?)',
+    [classId, nome, matricula, curso, periodo, biometria],
     function(err) {
       if (err) {
         return res.status(500).json({ message: 'Erro ao registrar presença' });
